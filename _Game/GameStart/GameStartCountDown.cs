@@ -37,7 +37,7 @@ public class GameStartCountDown : MonoBehaviour
     {
         if (CountDown < 0)
         {
-            gameObject.SetActive(false); 
+            gameObject.SetActive(false);
         }
         CountDown -= Time.deltaTime / Global.TimeScaleBeforeGameStart * countDownMultiplier;
 
@@ -48,5 +48,13 @@ public class GameStartCountDown : MonoBehaviour
             gameStartEvent.Raise();
             gameStartRaised = true;
         }
+    }
+
+    public void ResetCountDown()
+    {
+        Debug.Log("reset countdown");
+        CountDown = StartTimer + 1;
+        gameStartRaised = false;
+        gameObject.SetActive(true); // Reactivate the game object if it was deactivated
     }
 }

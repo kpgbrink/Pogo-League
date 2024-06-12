@@ -39,9 +39,6 @@ public abstract class PlayerInputBase : PlayerObject
 
     public Vector3 StartingLocalPosition { get; set; }
 
-    // Get if game is going
-    FixedUpdateClock FixedUpdateClock => GameObject.Find("/FixedUpdateClock").GetComponent<FixedUpdateClock>();
-
     void OnDestroy()
     {
         Destroyed?.Invoke();

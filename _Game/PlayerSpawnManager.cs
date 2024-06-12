@@ -72,7 +72,7 @@ public class PlayerSpawnManager : MonoBehaviour
         playerSpar.Team = playerSpar.ChoosenTeam;
         FixTeams();
         var usedSpawnType = firstSpawn ? firstSpawnType : spawnType;
-        Debug.Log($"Spawn type {usedSpawnType}");
+        //Debug.Log($"Spawn type {usedSpawnType}");
         switch (usedSpawnType)
         {
             case SpawnTypes.RoundRobin:

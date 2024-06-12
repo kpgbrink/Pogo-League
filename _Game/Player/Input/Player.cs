@@ -43,6 +43,7 @@ public class Player : MonoBehaviour
     GameEvent playerCompletelyDieEvent;
 
     PlayerSpawnManager spawnManager;
+    FixedUpdateClock fixedUpdateClock;
     [NonSerialized]
     PlayerInput playerInput;
 
@@ -77,12 +78,10 @@ public class Player : MonoBehaviour
     {
         get
         {
-            var FixedUpdateClockGameObject = GameObject.Find("/FixedUpdateClock");
-            if (FixedUpdateClockGameObject == null)
-            {
-                return null;
-            }
-            return FixedUpdateClockGameObject.GetComponent<FixedUpdateClock>();
+            if (fixedUpdateClock != null)
+                return fixedUpdateClock;
+            fixedUpdateClock = GameObject.Find("/FixedUpdateClock")?.GetComponent<FixedUpdateClock>();
+            return fixedUpdateClock;
         }
     }
 

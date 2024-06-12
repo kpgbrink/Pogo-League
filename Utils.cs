@@ -110,5 +110,40 @@ namespace AutoLevelMenu
             var dot = Vector3.Dot(resultingUpVector, plane.position - transform.position);
             return dot < 0;
         }
+
+        public static float NormalizeAngle(float angle)
+        {
+            angle %= 360;    // Use modulo to wrap angle within a 0 to 360 range
+            if (angle < 0)          // Ensure angle is always positive
+                angle += 360;
+            return angle;
+        }
+
+        public static float NormalizeAngleTo180(float angle)
+        {
+            angle = NormalizeAngle(angle);  // First normalize to 0-360
+            if (angle > 180)               // Adjust to -180 to 180
+                angle -= 360;
+            return angle;
+        }
+
+        public static bool CheckSphereCompletelyInsideBox(SphereCollider inside, BoxCollider container)
+        {
+            var sphereCollider = inside;
+            var boxCollider = container;
+
+            if (sphereCollider == null || boxCollider == null)
+            {
+                return false;
+            }
+
+            var boxBounds = boxCollider.bounds;
+            var sphereCenter = sphereCollider.transform.TransformPoint(sphereCollider.center);
+            var sphereRadius = sphereCollider.radius * Mathf.Max(sphereCollider.transform.lossyScale.x, sphereCollider.transform.lossyScale.y, sphereCollider.transform.lossyScale.z); // Handle non-uniform scaling
+
+            // Check if the sphere is completely inside the box
+            return boxBounds.Contains(sphereCenter - new Vector3(sphereRadius, sphereRadius, sphereRadius)) &&
+                   boxBounds.Contains(sphereCenter + new Vector3(sphereRadius, sphereRadius, sphereRadius));
+        }
     }
 }
