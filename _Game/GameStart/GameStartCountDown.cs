@@ -12,49 +12,80 @@ public class GameStartCountDown : MonoBehaviour
     TextMeshProUGUI text;
 
     [SerializeField]
-    int StartTimer = 3;
+    float countDownMultiplier = 1f; // THis is kinda for testing purposes. I don't want to wait at all when I test.
 
-    [SerializeField]
-    string EndingString = "Start";
-
-    [SerializeField]
-    float countDownMultiplier = 1f;
-
-    float CountDown;
-
-    bool gameStartRaised = false;
+    //bool gameStartRaised = false;
 
     [SerializeField]
     GameEvent gameStartEvent;
 
-    // Start is called before the first frame update
-    void Start()
+    // This will be the four seconds for the thing
+    CountDownTimer countDownTimer = new(300);
+
+    CountDownTimer goTextLingerTime = new(100);
+
+    private void Start()
     {
-        CountDown = StartTimer + 1;
+        countDownTimer.StopTimer();
+        goTextLingerTime.StopTimer();
     }
 
-    void Update()
+    private void FixedUpdate()
     {
-        if (CountDown < 0)
+        CountDownTimer();
+        GoTextLingerTimer();
+    }
+
+    private void GoTextLingerTimer()
+    {
+        if (!goTextLingerTime.Going) return;
+        goTextLingerTime.CountDown();
+        if (goTextLingerTime.CheckFinished())
         {
             gameObject.SetActive(false);
+            text.text = "";
+            goTextLingerTime.StopTimer();
         }
-        CountDown -= Time.deltaTime / Global.TimeScaleBeforeGameStart * countDownMultiplier;
+    }
 
-        var countDown = Math.Min(StartTimer, (int) CountDown);
-        text.text = countDown != 0 ? $"{countDown}" : EndingString;
-        if (!gameStartRaised && countDown <= 0)
+    private void CountDownTimer()
+    {
+        if (!countDownTimer.Going) return;
+        countDownTimer.CountDown(countDownMultiplier);
+        // Show the proper message based on 100 ms intervals
+        if (countDownTimer.Value <= 300 && countDownTimer.Value > 200)
         {
+            text.text = "3";
+        }
+        else if (countDownTimer.Value <= 200 && countDownTimer.Value > 100)
+        {
+            text.text = "2";
+        }
+        else if (countDownTimer.Value <= 100 && countDownTimer.Value > 0)
+        {
+            text.text = "1";
+        }
+        else if (countDownTimer.Value <= 0)
+        {
+            text.text = "GO!";
+        }
+
+        if (countDownTimer.CheckFinished())
+        {
+            Debug.Log("countdown finished");
             gameStartEvent.Raise();
-            gameStartRaised = true;
+            goTextLingerTime.StartTimer();
+            countDownTimer.StopTimer();
+
+            //gameStartRaised = true;
         }
     }
 
     public void ResetCountDown()
     {
         Debug.Log("reset countdown");
-        CountDown = StartTimer + 1;
-        gameStartRaised = false;
+        countDownTimer.StartTimer();
+        //gameStartRaised = false;
         gameObject.SetActive(true); // Reactivate the game object if it was deactivated
     }
 }

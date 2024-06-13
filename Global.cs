@@ -17,7 +17,5 @@ namespace AutoLevelMenu
         }
 
         public static int FixedTimeStep = 100;
-
-        public static float TimeScaleBeforeGameStart = .05f;
     }
 }

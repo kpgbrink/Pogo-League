@@ -27,9 +27,6 @@ public class GoalScoreDevice : MonoBehaviour
     private Quaternion originalRotation;
 
     [SerializeField]
-    UnityEvent onGoalScored;
-
-    [SerializeField]
     Rigidbody rb;
 
     [SerializeField]
@@ -222,18 +219,10 @@ public class GoalScoreDevice : MonoBehaviour
 
         ResetValuesOnGoal.HasScored = true;
         HandleGoalScorePoint(playerGoal: playerGoal, teamGoal: teamGoal, collisionEnter: collisionEnter);
-        // Run Events on score
-        onGoalScored.Invoke();
 
         // Start respawn timer
-        StartRespawn();
-        SetVisibleAndCollidable(false, false);
-    }
-
-    void StartRespawn()
-    {
-        // set rigidbody to kinematic temporarily
         rb.isKinematic = true;
+        SetVisibleAndCollidable(false, false);
     }
 
     private void HandleGoalScorePoint(bool teamGoal, bool playerGoal, CollisionEnter collisionEnter)

@@ -22,7 +22,7 @@ namespace AutoLevelMenu.Events
         protected override void Handle(Vector3 explosionPosition, float explosionForce)
         {
             Debug.Log("PlayerExplosionEventListener.Handle()");
-            var direction = transform.position - explosionPosition;
+            var direction = rb.position - explosionPosition;
             var distance = direction.magnitude;
 
             // Ensure the explosion force has a minimum value

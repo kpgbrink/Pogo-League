@@ -14,14 +14,8 @@ public class FixedUpdateClock : MonoBehaviour
 
     public int Clock { get; private set; }
 
-    private void Start()
-    {
-        Time.timeScale = Global.TimeScaleBeforeGameStart;
-    }
-
     public void SetGameGoing()
     {
-        Time.timeScale = 1;
         GameGoing = true;
     }
 

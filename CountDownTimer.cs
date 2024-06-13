@@ -25,6 +25,12 @@ public class CountDownTimer
          Value--;
     }
 
+    public void CountDown(float delta)
+    {         
+        if (!ShouldCountDown) return;
+        Value -= delta;
+    }
+
     public void CountDownTimeDelta()
     {
         if (!ShouldCountDown) return;
