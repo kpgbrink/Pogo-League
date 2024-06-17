@@ -81,9 +81,9 @@ public class GameStartCountDown : MonoBehaviour
         }
     }
 
-    public void ResetCountDown()
+    public void StartCountdown()
     {
-        Debug.Log("reset countdown");
+        //Debug.Log("reset countdown");
         countDownTimer.StartTimer();
         //gameStartRaised = false;
         gameObject.SetActive(true); // Reactivate the game object if it was deactivated

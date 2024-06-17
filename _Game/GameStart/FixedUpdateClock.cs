@@ -1,4 +1,5 @@
 ﻿using AutoLevelMenu;
+using AutoLevelMenu.Events;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -10,23 +11,55 @@ public class FixedUpdateClock : MonoBehaviour
     TimeText[] timeTexts;
 
     // Start is called before the first frame update
-    public bool GameGoing { get; private set; } = false;
+    public bool GameStarted { get; private set; } = false;
+
+    public bool GamePaused { get; private set; } = false;
+
+    public bool GameEnded { get; private set; } = false;
 
     public int Clock { get; private set; }
 
-    public void SetGameGoing()
+    public class ResetableValuesOnSceneInit
     {
-        GameGoing = true;
+        public bool GameBeforeStart { get; set; } = true;
+        public bool GameAfterEnd { get; set; } = false;
     }
 
-    public void SetGameGoingFalse()
+    public ResetableValuesOnSceneInit ResetValuesOnSceneInit { get; set; }
+
+    public void Start()
     {
-        GameGoing = false;
+        ResetValuesOnSceneInit = new ResetableValuesOnSceneInit();
+    }
+
+    public void SetGameGoing(bool going)
+    {
+        GameStarted = going;
+        if (going)
+        {
+            GamePaused = false;
+            ResetValuesOnSceneInit.GameBeforeStart = false;
+        }
+    }
+
+    public void SetGamePause(bool pause)
+    {
+        Debug.Log($"SetGamePause: {pause}");
+        GamePaused = pause;
+    }
+
+    public void SetGameEnd(bool end)
+    {
+        GameEnded = end;
+        if (end)
+        {
+            ResetValuesOnSceneInit.GameAfterEnd = true;
+        }
     }
 
     void FixedUpdate()
     {
-        if (GameGoing)
+        if (GameStarted && !GamePaused)
         {
             Clock++;
         }

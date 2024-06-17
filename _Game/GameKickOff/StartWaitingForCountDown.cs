@@ -18,7 +18,7 @@ namespace Assets.Scripts._Game.GameStart
         int multiplyCountDown = 1;
 
         [SerializeField]
-        GameEvent gameStartCountdownTimerEvent;
+        GameEvent startCountdownTimerEvent;
 
         private void Start()
         {
@@ -32,11 +32,11 @@ namespace Assets.Scripts._Game.GameStart
             {
                 Debug.Log("countdown finished");
                 gameObject.SetActive(false);
-                gameStartCountdownTimerEvent.Raise();
+                startCountdownTimerEvent.Raise();
             }
         }
 
-        public void ResetCountDown()
+        public void StartCountdown()
         {
             countDownTimer.StartTimer();
             gameObject.SetActive(true);

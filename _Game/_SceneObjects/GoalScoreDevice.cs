@@ -95,12 +95,17 @@ public class GoalScoreDevice : MonoBehaviour
         SetVisibleAndCollidable(true, true);
         // Set back to original location.
         transform.SetPositionAndRotation(originalLocation, originalRotation);
-        rb.isKinematic = false;
+        //rb.isKinematic = false;
         // Reset all physics
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         // Reset values on respawn
         RestValuesOnRespawn();
+    }
+
+    public void StartMoving()
+    {
+       rb.isKinematic = false;
     }
 
     class PlayerHitData

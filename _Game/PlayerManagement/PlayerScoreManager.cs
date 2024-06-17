@@ -134,6 +134,7 @@ public class PlayerScoreManager : MonoBehaviour
             GameEnd.OnGameEnd(
                 (GameEndStates)gameEndState,
                 playerSpars);
+            gameEndEvent.Raise();
         }
     }
 
@@ -211,7 +212,7 @@ public class PlayerScoreManager : MonoBehaviour
                 if (topPlayerScore > topTeamScore)
                 {
                     return ReturnPlayers(TopPlayerScoresSpars());
-                }
+                }  
                 else if (topTeamScore > topPlayerScore)
                 {
                     return ReturnPlayers(TopTeamPlayerScoresSpars());

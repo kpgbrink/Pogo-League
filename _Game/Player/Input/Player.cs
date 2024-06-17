@@ -88,7 +88,25 @@ public class Player : MonoBehaviour
     bool? GameGoing()
     {
         if (FixedUpdateClock == null) return null;
-        return FixedUpdateClock.GameGoing;
+        return FixedUpdateClock.GameStarted;
+    }
+
+    bool? GamePaused()
+    {
+        if (FixedUpdateClock == null) return null;
+        return FixedUpdateClock.GamePaused;
+    }
+
+    bool? GameBeforeStart()
+    {
+        if (FixedUpdateClock == null) return null;
+        return FixedUpdateClock.ResetValuesOnSceneInit.GameBeforeStart;
+    }
+
+    bool? GameAfterEnd()
+    {
+        if (FixedUpdateClock == null) return null;
+        return FixedUpdateClock.ResetValuesOnSceneInit.GameAfterEnd;
     }
 
     public int PlayerNumber => playerSparData.PlayerSpars.IndexOf(playerSpar);
@@ -96,8 +114,6 @@ public class Player : MonoBehaviour
     public class ResetableValuesOnSceneInit
     {
         public int SpawnNum { get; set; } = 0;
-        public bool GameBeforeStart { get; set; } = true;
-        public bool GameAfterEnd { get; set; } = false;
         public bool ControlEnabled { get; set; }
         public bool CompletelyDead => DeathFinalTime != null;
         public int? DeathFinalTime { get; set; } = null;
@@ -170,8 +186,11 @@ public class Player : MonoBehaviour
     public List<PlayerInputBase> PlayerControlledObjectsControlActive =>
         PlayerControlledObjects.Where(o =>
         {
-            if (!o.ControlActiveBeforeGameStart && ResetValuesOnSceneInit.GameBeforeStart) return false;
-            if (!o.ControlActiveAfterGameEnd && ResetValuesOnSceneInit.GameAfterEnd) return false;
+            //Debug.Log("SHow all of the bools that are below" + (!o.ControlActiveBeforeGameStart && GameBeforeStart().GetValueOrDefault()) + (!o.ControlActiveOnGamePause && GamePaused().GetValueOrDefault()) + (!o.ControlActiveAfterGameEnd && GameAfterEnd().GetValueOrDefault()));
+            if (!o.ControlActiveBeforeGameStart && GameBeforeStart().GetValueOrDefault()) return false;
+            // stop controls if game is not going
+            if (!o.ControlActiveOnGamePause && GamePaused().GetValueOrDefault()) return false;
+            if (!o.ControlActiveAfterGameEnd && GameAfterEnd().GetValueOrDefault()) return false;
             return o.ControlActive;
         }).ToList();
 
@@ -324,32 +343,13 @@ public class Player : MonoBehaviour
     void FixedUpdate()
     {
         RespawnCountdown();
-        CheckGameGoing();
-    }
-
-    void CheckGameGoing()
-    {
-        var gameGoing = GameGoing();
-        if (gameGoing != null)
-        {
-            if (gameGoing == true && ResetValuesOnSceneInit.GameBeforeStart)
-            {
-                ResetValuesOnSceneInit.GameBeforeStart = false;
-                return;
-            }
-            if (gameGoing == false && ResetValuesOnSceneInit.GameBeforeStart == false)
-            {
-                ResetValuesOnSceneInit.GameAfterEnd = true;
-                return;
-            }
-        }
     }
 
     void RespawnCountdown()
     {
+        if (!respawnTimer.CheckFinished()) return;
         respawnTimer.CountDown();
         //Debug.Log(respawnTimer.Value);
-        if (!respawnTimer.CheckFinished()) return;
         respawnTimer.Going = false;
         // Respawn
         Respawn();

@@ -3,6 +3,9 @@ using System.Collections;
 using AutoLevelMenu.Events;
 using Assets.Scripts._Game.GameStart;
 
+/// <summary>
+/// This kinda just makes timers run when they can't listen to things because they are inactived.
+/// </summary>
 public class GameFlowManager : MonoBehaviour
 {
     [SerializeField]
@@ -17,11 +20,8 @@ public class GameFlowManager : MonoBehaviour
     [SerializeField]
     GameEvent startWaitingForCountdownEvent;
 
-
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    GameEvent gamePauseEvent;
 
     public void OnGoal()
     {
@@ -33,17 +33,13 @@ public class GameFlowManager : MonoBehaviour
     {
         startWaitingForCountdownEvent.Raise();
         // Another game object with a timer will have the timer to start waiting for countdown
-        startWaitingForCountDown.ResetCountDown();
+        startWaitingForCountDown.StartCountdown();
     }
 
     public void StartCountDown()
     {
-        gameStartCountDown.ResetCountDown();
-    }
-
-    public void KickOff()
-    {
-
+        gamePauseEvent.Raise();
+        gameStartCountDown.StartCountdown();
     }
 
     public void StartPostGameWait()
