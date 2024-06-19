@@ -80,7 +80,11 @@ public class Player : MonoBehaviour
         {
             if (fixedUpdateClock != null)
                 return fixedUpdateClock;
-            fixedUpdateClock = GameObject.Find("/FixedUpdateClock")?.GetComponent<FixedUpdateClock>();
+            var foundObject = GameObject.Find("/FixedUpdateClock");
+            if (foundObject != null)
+            {
+                fixedUpdateClock = foundObject.GetComponent<FixedUpdateClock>();
+            }
             return fixedUpdateClock;
         }
     }
@@ -266,47 +270,89 @@ public class Player : MonoBehaviour
         if (SpawnManager == null)
         {
             Debug.LogError("SpawnManager is null");
+            return;
         }
+
         // Set lives if first spawn
         if (firstSpawn)
         {
             Lives = SpawnManager.Lives;
         }
+
         var spawnTransform = SpawnManager.GetSpawnPoint(playerSpar, PlayerNumber, firstSpawn);
-        // Add the spawn number
+        // Increment the spawn number
         ResetValuesOnSceneInit.SpawnNum++;
-        // Add the objects
+
+        // Reset existing objects with RespawnReusesGameObject
+        var existingObjects = PlayerControlledObjects.Where(p => p.RespawnReusesGameObject).ToList();
+        foreach (var existingObj in existingObjects)
+        {
+            // Reset the main object position and rotation
+            existingObj.transform.SetPositionAndRotation(spawnTransform.position, spawnTransform.rotation);
+            Debug.Log("Existing Object New Position: " + existingObj.transform.position);
+
+            // Reset the positions and velocities of the child objects
+            foreach (Transform child in existingObj.transform)
+            {
+                var playerInputBase = existingObj.GetComponent<PlayerInputBase>();
+                if (playerInputBase != null)
+                {
+                    child.SetLocalPositionAndRotation(playerInputBase.GetInitialLocalPosition(child), Quaternion.identity);
+                    var playerObjs = child.GetComponentsInChildren<IPlayerObject>();
+                    foreach (var playerObj in playerObjs)
+                    {
+                        playerObj.PlayerInputTransform = transform;
+                    }
+
+                    Debug.Log("Reset child object: " + child.name);
+                }
+            }
+
+            // Freeze the rigidbodies for movement
+            var rigidbodies = existingObj.GetComponentsInChildren<Rigidbody>();
+            foreach (var rb in rigidbodies)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+
+        // Add or instantiate objects
         foreach (Transform playerStartingObjectsChild in StartingObjects.transform)
         {
             foreach (Transform child in playerStartingObjectsChild)
             {
-                // prevent respawning object that does not respawn
-                if (!firstSpawn)
+                if (!child.TryGetComponent<PlayerInputBase>(out var playerInputBase))
                 {
-                    var playerInputBase = child.GetComponent<PlayerInputBase>();
-                    if (playerInputBase != null && !playerInputBase.MakeOnRespawn)
-                    {
-                        continue;
-                    }
+                    Debug.LogError("PlayerInputBase component is missing on a child object.");
+                    continue;
                 }
+
+                // Prevent respawning object that does not respawn
+                if (!firstSpawn && !playerInputBase.MakeOnRespawn)
+                {
+                    continue;
+                }
+
+                if (!firstSpawn && playerInputBase.RespawnReusesGameObject)
+                {
+                    continue;
+                }
+
+                // Instantiate new object
                 var obj = UnityEngine.Object.Instantiate(child, child.transform.position + spawnTransform.position, spawnTransform.rotation);
-                // I'm pretty sure this makes no sense
-                // it's not adding a PlayerObject to anything
-                // This makes no sense
+
                 var playerObjs = obj.GetComponentsInChildren<IPlayerObject>();
                 foreach (var playerObj in playerObjs)
                 {
                     playerObj.PlayerInputTransform = transform;
                 }
+
                 AddPlayerControlledGameObject(obj);
             }
         }
-        //// Set the transform positions and rotations of the player object
-        //PlayerControlledObjects.ForEach(p =>
-        //{
-        //    if (ResetValuesOnSceneInit.SpawnNum != p.SpawnNum) return;
-        //    p.transform.SetPositionAndRotation(p.StartingLocalPosition + spawnTransform.position, spawnTransform.rotation);
-        //});
+
+        // Call events for previously spawned objects
         SpawnEventsOnPreviousSpawned();
     }
 

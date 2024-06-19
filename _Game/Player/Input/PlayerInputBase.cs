@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,6 +10,12 @@ public abstract class PlayerInputBase : PlayerObject
     public int? SpawnNum { get; set; } = null;
 
     public Camera splitScreenCamera;
+
+    // This will basically be used to just move the objects in a respawn run a method on it or something after a respawn and then call it good.
+    // Prevent the object from being destroyed and recreated.
+    [SerializeField]
+    bool respawnReusesGameObject = true;
+    public bool RespawnReusesGameObject => respawnReusesGameObject;
 
     [SerializeField]
     bool destroyable = true;
@@ -43,6 +50,8 @@ public abstract class PlayerInputBase : PlayerObject
 
     public Vector3 StartingLocalPosition { get; set; }
 
+    private Dictionary<Transform, Vector3> initialLocalPositions = new Dictionary<Transform, Vector3>();
+
     void OnDestroy()
     {
         Destroyed?.Invoke();
@@ -51,6 +60,20 @@ public abstract class PlayerInputBase : PlayerObject
     void Awake()
     {
         StartingLocalPosition = transform.localPosition;
+        StoreInitialLocalPositions();
+    }
+
+    private void StoreInitialLocalPositions()
+    {
+        foreach (Transform child in transform)
+        {
+            initialLocalPositions[child] = child.localPosition;
+        }
+    }
+
+    public Vector3 GetInitialLocalPosition(Transform child)
+    {
+        return initialLocalPositions.TryGetValue(child, out var position) ? position : Vector3.zero;
     }
 
     public virtual void OnPlayerInputActionTriggered(InputAction.CallbackContext inputAction)
@@ -60,6 +83,11 @@ public abstract class PlayerInputBase : PlayerObject
     public void Die(bool lowerLives)
     {
         Player.Die(spawnNum: SpawnNum, lowerLives: lowerLives);
+    }
+
+    public void Respawn()
+    {
+        Player.Respawn();
     }
 
     // This is only called on spawn if there is a camera set for the player.

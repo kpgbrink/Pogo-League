@@ -54,6 +54,17 @@ public class GoalScoreDevice : MonoBehaviour
     {
         StoreOriginalPosition();
         InstantiateDefaultExplosion();
+        Freeze();
+    }
+
+    void Freeze()
+    {
+        rb.isKinematic = true;
+    }
+
+    void UnFreeze()
+    {
+        rb.isKinematic = false;
     }
 
     void InstantiateDefaultExplosion()
@@ -105,7 +116,7 @@ public class GoalScoreDevice : MonoBehaviour
 
     public void StartMoving()
     {
-       rb.isKinematic = false;
+        UnFreeze();
     }
 
     class PlayerHitData
@@ -226,7 +237,7 @@ public class GoalScoreDevice : MonoBehaviour
         HandleGoalScorePoint(playerGoal: playerGoal, teamGoal: teamGoal, collisionEnter: collisionEnter);
 
         // Start respawn timer
-        rb.isKinematic = true;
+        Freeze();
         SetVisibleAndCollidable(false, false);
     }
 
