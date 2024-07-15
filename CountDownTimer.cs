@@ -10,7 +10,7 @@ public class CountDownTimer
 
     public float Value { get; set; } = 0;
 
-    public bool Going { get; set; } = true;
+    bool Going { get; set; } = true;
 
     public CountDownTimer() { }
 
@@ -22,11 +22,11 @@ public class CountDownTimer
     public void CountDown()
     {
         if (!ShouldCountDown) return;
-         Value--;
+        Value--;
     }
 
     public void CountDown(float delta)
-    {         
+    {
         if (!ShouldCountDown) return;
         Value -= delta;
     }
@@ -36,6 +36,8 @@ public class CountDownTimer
         if (!ShouldCountDown) return;
         Value -= Time.deltaTime;
     }
+
+    public bool GetIsGoing() => Going;
 
 
     bool ShouldCountDown => Value > 0 && Going;
@@ -56,7 +58,17 @@ public class CountDownTimer
         Going = false;
     }
 
-    public bool CheckFinished(bool restartTimer = false)
+    // Check if the timer just finished
+    public bool JustFinished(bool restartTimer = false)
+    {
+        if (Value > 0) return false;
+        if (restartTimer)
+            StartTimer();
+        return true;
+    }
+
+    // Check if the timer is stopped
+    public bool IsFinished(bool restartTimer = false)
     {
         if (Value > 0) return false;
         if (!Going) return false;

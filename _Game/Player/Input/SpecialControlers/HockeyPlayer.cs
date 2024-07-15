@@ -1,7 +1,4 @@
-﻿using AutoLevelMenu.Enums;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class HockeyPlayer : PlayerInputBase
@@ -56,7 +53,7 @@ public class HockeyPlayer : PlayerInputBase
                     break;
                 case PlayerInputs.LeftTrigger:
                 case PlayerInputs.RightTrigger:
-                    if (speedBoostTimer.CheckFinished(true))
+                    if (speedBoostTimer.IsFinished(true))
                     {
                         mainBodyRb.linearVelocity *= 2;
                     }

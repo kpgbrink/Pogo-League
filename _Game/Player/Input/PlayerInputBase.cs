@@ -30,10 +30,6 @@ public abstract class PlayerInputBase : PlayerObject
     public bool ControlActiveBeforeGameStart => controlActiveBeforeGameStart;
 
     [SerializeField]
-    bool controlActiveOnGamePause = true;
-    public bool ControlActiveOnGamePause => controlActiveOnGamePause;
-
-    [SerializeField]
     bool controlActiveAfterGameEnd = true;
     public bool ControlActiveAfterGameEnd => controlActiveAfterGameEnd;
 

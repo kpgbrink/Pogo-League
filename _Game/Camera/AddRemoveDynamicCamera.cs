@@ -15,7 +15,7 @@ public class AddRemoveDynamicCamera : MonoBehaviour
             this.AddToDynamicCameraController();
         }
     }
-    
+
     public void AddToDynamicCameraController()
     {
         // Add this to the list of targets in the DynamicCameraController
@@ -24,7 +24,19 @@ public class AddRemoveDynamicCamera : MonoBehaviour
 
     public void RemoveFromDynamicCameraController()
     {
-        // Remove this from the list of targets in the DynamicCameraController
-        dynamicCameraController.targets.Remove(this.transform);
+        try
+        {
+            // Remove this from the list of targets in the DynamicCameraController
+            dynamicCameraController.targets.Remove(this.transform);
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log($"Error removing from dynamic camera controller: {e.Message}");
+        }
+    }
+
+    void OnDestroy()
+    {
+        RemoveFromDynamicCameraController();
     }
 }

@@ -58,7 +58,7 @@ public class DamageTaker : PlayerObject
         var impulse = collision.impulse;
 
         // Check timer
-        if (!canGetDamage.damageBetweenTimer.CheckFinished() && !damageGiver.canDamage.overrideDamageTimer) return;
+        if (!canGetDamage.damageBetweenTimer.IsFinished() && !damageGiver.canDamage.overrideDamageTimer) return;
         canGetDamage.damageBetweenTimer.StartTimer();
 
         var otherPlayerSpar = damageGiver.PlayerSpar;

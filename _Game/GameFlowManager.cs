@@ -25,6 +25,7 @@ public class GameFlowManager : MonoBehaviour
 
     public void OnGoal()
     {
+        gamePauseEvent.Raise();
         // Handle the stuff once the goal happens.
         StartWaitingForCountdown();
     }
@@ -38,7 +39,6 @@ public class GameFlowManager : MonoBehaviour
 
     public void StartCountDown()
     {
-        gamePauseEvent.Raise();
         gameStartCountDown.StartCountdown();
     }
 

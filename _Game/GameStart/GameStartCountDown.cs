@@ -1,8 +1,4 @@
-﻿using AutoLevelMenu;
-using AutoLevelMenu.Events;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using AutoLevelMenu.Events;
 using TMPro;
 using UnityEngine;
 
@@ -38,9 +34,9 @@ public class GameStartCountDown : MonoBehaviour
 
     private void GoTextLingerTimer()
     {
-        if (!goTextLingerTime.Going) return;
+        if (!goTextLingerTime.GetIsGoing()) return;
         goTextLingerTime.CountDown();
-        if (goTextLingerTime.CheckFinished())
+        if (goTextLingerTime.IsFinished())
         {
             gameObject.SetActive(false);
             text.text = "";
@@ -50,7 +46,7 @@ public class GameStartCountDown : MonoBehaviour
 
     private void CountDownTimer()
     {
-        if (!countDownTimer.Going) return;
+        if (!countDownTimer.GetIsGoing()) return;
         countDownTimer.CountDown(countDownMultiplier);
         // Show the proper message based on 100 ms intervals
         if (countDownTimer.Value <= 300 && countDownTimer.Value > 200)
@@ -70,7 +66,7 @@ public class GameStartCountDown : MonoBehaviour
             text.text = "GO!";
         }
 
-        if (countDownTimer.CheckFinished())
+        if (countDownTimer.IsFinished())
         {
             Debug.Log("countdown finished");
             gameStartEvent.Raise();
@@ -87,5 +83,10 @@ public class GameStartCountDown : MonoBehaviour
         countDownTimer.StartTimer();
         //gameStartRaised = false;
         gameObject.SetActive(true); // Reactivate the game object if it was deactivated
+    }
+
+    public bool GetCountDownTimerFinished()
+    {
+        return countDownTimer.IsFinished();
     }
 }

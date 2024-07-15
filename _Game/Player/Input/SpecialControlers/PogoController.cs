@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using AutoLevelMenu;
+using System.Collections.Generic;
 
 public class PogoController : PlayerInputBase
 {
@@ -21,9 +22,70 @@ public class PogoController : PlayerInputBase
 
     Vector2 inputMovement;
 
+    bool IsWaitingForKickoff = false;
+
+    [SerializeField]
+    GameStartCountDown gameStartCountDown;
+
+    [SerializeField]
+    FixedUpdateClock fixedUpdateClock;
+
+    private Dictionary<Rigidbody, RigidbodyConstraints> originalConstraints = new Dictionary<Rigidbody, RigidbodyConstraints>();
+
     public void Start()
     {
         Debug.Log(configurableJoint);
+
+        // A player could spawn during countdown, so we need to wait for kickoff if it in that setting.
+        // This will make the player wait for kickoff. But also freeze the player before the hmm
+        if (gameStartCountDown != null && !gameStartCountDown.GetCountDownTimerFinished())
+        {
+            Debug.Log("Freeeeeeeeeeeeeeeze");
+            WaitForKickOff();
+        }
+    }
+
+    public void WaitForKickOff()
+    {
+        // only respawn if the game has not started
+        if (fixedUpdateClock != null && !fixedUpdateClock.ResetValuesOnSceneInit.GameBeforeStart)
+        {
+            Respawn();
+        }
+        inputMovement = Vector2.zero;
+        IsWaitingForKickoff = true;
+        FreezeRigidBodies();
+    }
+
+    public void KickOff()
+    {
+        IsWaitingForKickoff = false;
+        UnFreezeRigidBodies();
+    }
+
+    void FreezeRigidBodies()
+    {
+        var rigidbodies = GetComponentsInChildren<Rigidbody>();
+        foreach (var rb in rigidbodies)
+        {
+            if (!originalConstraints.ContainsKey(rb))
+            {
+                originalConstraints[rb] = rb.constraints;
+            }
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+        }
+    }
+
+    void UnFreezeRigidBodies()
+    {
+        var rigidbodies = GetComponentsInChildren<Rigidbody>();
+        foreach (var rb in rigidbodies)
+        {
+            if (originalConstraints.ContainsKey(rb))
+            {
+                rb.constraints = originalConstraints[rb];
+            }
+        }
     }
 
     public override void OnPlayerInputActionTriggered(InputAction.CallbackContext inputAction)
@@ -41,6 +103,18 @@ public class PogoController : PlayerInputBase
     }
 
     void FixedUpdate()
+    {
+        HandleInput();
+    }
+
+    void HandleInput()
+    {
+        if (IsWaitingForKickoff) { return; }
+        HandleJoystickInput();
+    }
+
+
+    void HandleJoystickInput()
     {
         // Get the horizontal and vertical values of the left stick
         //Debug.Log($"inputMovment.x: {inputMovement.x} inputMovement.y {inputMovement.y}");

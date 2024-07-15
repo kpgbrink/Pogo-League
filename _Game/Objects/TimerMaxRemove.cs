@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.Pool;
+﻿using UnityEngine;
 
 namespace Assets.Scripts._Game.Objects
 {
@@ -21,7 +15,7 @@ namespace Assets.Scripts._Game.Objects
         public void FixedUpdate()
         {
             maxTimer.CountDown();
-            if (maxTimer.CheckFinished())
+            if (maxTimer.IsFinished())
             {
                 ObjectPooler.Release(gameObject);
             }

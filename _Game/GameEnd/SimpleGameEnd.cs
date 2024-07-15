@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class SimpleGameEnd : MonoBehaviour, IOnGameEnd
@@ -17,7 +16,7 @@ public class SimpleGameEnd : MonoBehaviour, IOnGameEnd
 
     public void Start()
     {
-        ToDataScreenTimer.Going = false;
+        ToDataScreenTimer.StopTimer();
     }
 
     public void OnGameEnd(GameEndStates gameEndState, List<PlayerSpar> playerSparsWinner)
@@ -45,9 +44,9 @@ public class SimpleGameEnd : MonoBehaviour, IOnGameEnd
     void FixedUpdate()
     {
         ToDataScreenTimer.CountDown();
-        if (ToDataScreenTimer.CheckFinished())
+        if (ToDataScreenTimer.IsFinished())
         {
-            ToDataScreenTimer.Going = false;
+            ToDataScreenTimer.StopTimer();
             winnerText.SetActive(false);
             ShowDataScreen();
         }

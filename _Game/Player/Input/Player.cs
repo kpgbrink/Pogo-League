@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Assets.Scripts;
+using Assets.Scripts._Game.Player.Damage;
 using AutoLevelMenu.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using System.Linq;
-using System;
-using Assets.Scripts;
-using Assets.Scripts._Game.Player.Damage;
 
 [RequireComponent(typeof(PlayerInput))]
 public class Player : MonoBehaviour
@@ -93,12 +92,6 @@ public class Player : MonoBehaviour
     {
         if (FixedUpdateClock == null) return null;
         return FixedUpdateClock.GameStarted;
-    }
-
-    bool? GamePaused()
-    {
-        if (FixedUpdateClock == null) return null;
-        return FixedUpdateClock.GamePaused;
     }
 
     bool? GameBeforeStart()
@@ -192,8 +185,6 @@ public class Player : MonoBehaviour
         {
             //Debug.Log("SHow all of the bools that are below" + (!o.ControlActiveBeforeGameStart && GameBeforeStart().GetValueOrDefault()) + (!o.ControlActiveOnGamePause && GamePaused().GetValueOrDefault()) + (!o.ControlActiveAfterGameEnd && GameAfterEnd().GetValueOrDefault()));
             if (!o.ControlActiveBeforeGameStart && GameBeforeStart().GetValueOrDefault()) return false;
-            // stop controls if game is not going
-            if (!o.ControlActiveOnGamePause && GamePaused().GetValueOrDefault()) return false;
             if (!o.ControlActiveAfterGameEnd && GameAfterEnd().GetValueOrDefault()) return false;
             return o.ControlActive;
         }).ToList();
@@ -393,10 +384,10 @@ public class Player : MonoBehaviour
 
     void RespawnCountdown()
     {
-        if (!respawnTimer.CheckFinished()) return;
+        if (!respawnTimer.IsFinished()) return;
         respawnTimer.CountDown();
         //Debug.Log(respawnTimer.Value);
-        respawnTimer.Going = false;
+        respawnTimer.StopTimer();
         // Respawn
         Respawn();
     }
@@ -473,10 +464,10 @@ public class Player : MonoBehaviour
         if (Lives > 0 || SpawnManager.InfiniteLives)
         {
             // Start the respawnTimer
-            if (respawnTimer.CheckFinished() || !respawnTimer.Going)
+            if (respawnTimer.IsFinished() || !respawnTimer.GetIsGoing())
             {
                 respawnTimer.Value = SpawnManager.RespawnFixedFramesStart;
-                respawnTimer.Going = true;
+                respawnTimer.ResumeTimer();
             }
         }
         else

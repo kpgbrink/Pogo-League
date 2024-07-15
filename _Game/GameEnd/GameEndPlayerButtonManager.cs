@@ -1,8 +1,6 @@
 ﻿using AutoLevelMenu.Common;
 using AutoLevelMenu.Events;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 public class GameEndPlayerButtonManager : MonoBehaviour
@@ -58,7 +56,7 @@ public class GameEndPlayerButtonManager : MonoBehaviour
         else
         {
             leaveSceneTimer.CountDownTimeDelta();
-            if (leaveSceneTimer.CheckFinished())
+            if (leaveSceneTimer.IsFinished())
             {
                 // Leave the scene
                 normalLoadEvent.Raise(levelsData.SceneLocationFullPath(levelsData.sceneLocations.mainMenu));

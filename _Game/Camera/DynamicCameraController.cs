@@ -32,23 +32,23 @@ public class DynamicCameraController : MonoBehaviour
 
     void Move()
     {
-        Vector3 centerPoint = GetCenterPoint();
+        var centerPoint = GetCenterPoint();
 
         // The camera only moves in the X and Y axes
-        Vector3 newPosition = new Vector3(centerPoint.x, centerPoint.y + verticalOffset, transform.position.z);
+        var newPosition = new Vector3(centerPoint.x, centerPoint.y + verticalOffset, transform.position.z);
         transform.position = Vector3.SmoothDamp(transform.position, newPosition, ref velocity, smoothTime);
     }
 
     void Zoom()
     {
-        float newZoom = Mathf.Lerp(maxZoom, minZoom, GetGreatestDistance() / zoomLimiter);
+        var newZoom = Mathf.Lerp(maxZoom, minZoom, GetGreatestDistance() / zoomLimiter);
         cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, newZoom, Time.deltaTime);
     }
 
     float GetGreatestDistance()
     {
         var bounds = new Bounds(targets[0].position, Vector3.zero);
-        for (int i = 1; i < targets.Count; i++)
+        for (var i = 1; i < targets.Count; i++)
         {
             bounds.Encapsulate(targets[i].position);
         }
@@ -63,7 +63,7 @@ public class DynamicCameraController : MonoBehaviour
         }
 
         var bounds = new Bounds(targets[0].position, Vector3.zero);
-        for (int i = 1; i < targets.Count; i++)
+        for (var i = 1; i < targets.Count; i++)
         {
             bounds.Encapsulate(targets[i].position);
         }
@@ -81,7 +81,7 @@ public class DynamicCameraController : MonoBehaviour
 
         // Draw the bounds
         var bounds = new Bounds(targets[0].position, Vector3.zero);
-        for (int i = 1; i < targets.Count; i++)
+        for (var i = 1; i < targets.Count; i++)
         {
             bounds.Encapsulate(targets[i].position);
         }
