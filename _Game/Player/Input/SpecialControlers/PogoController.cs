@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using UnityEngine.InputSystem;
-using AutoLevelMenu;
+﻿using AutoLevelMenu;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PogoController : PlayerInputBase
 {
@@ -105,6 +105,21 @@ public class PogoController : PlayerInputBase
     void FixedUpdate()
     {
         HandleInput();
+        CheckIfShouldUnfreeze();
+    }
+
+    void CheckIfShouldUnfreeze()
+    {
+        //Debug.Log("00000000000000000000000");
+        //Debug.Log("GamePaused: " + fixedUpdateClock.GamePaused);
+        //Debug.Log("GameWaitingForBallHit: " + fixedUpdateClock.GameWaitingForBallHit);
+        //Debug.Log("GameCountdownGoing: " + fixedUpdateClock.GameCountdownGoing);
+        //Debug.Log("IsWaitingForKickoff: " + IsWaitingForKickoff);
+        if (fixedUpdateClock == null) { return; }
+        if (!fixedUpdateClock.GamePaused && (fixedUpdateClock.GameWaitingForBallHit || fixedUpdateClock.GameCountdownGoing) && IsWaitingForKickoff)
+        {
+            KickOff();
+        }
     }
 
     void HandleInput()

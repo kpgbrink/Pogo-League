@@ -6,7 +6,7 @@ namespace Assets.Scripts._Game.GameStart
     public class StartWaitingForCountDown : MonoBehaviour
     {
         // This will be the four seconds for the thing
-        CountDownTimer countDownTimer = new(300);
+        CountDownTimer countDownTimer = new(100);
 
         [SerializeField]
         int multiplyCountDown = 1;

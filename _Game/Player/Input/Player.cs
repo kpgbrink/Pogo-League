@@ -88,10 +88,13 @@ public class Player : MonoBehaviour
         }
     }
 
-    bool? GameGoing()
+    bool? GameGoing
     {
-        if (FixedUpdateClock == null) return null;
-        return FixedUpdateClock.GameStarted;
+        get
+        {
+            if (FixedUpdateClock == null) return null;
+            return FixedUpdateClock.GameCountdownGoing;
+        }
     }
 
     bool? GameBeforeStart()
@@ -117,9 +120,9 @@ public class Player : MonoBehaviour
         public float TotalDamagesTaken => DamagesTaken.Sum(o => o.Value);
         public float TotalDamagesGiven => DamagesGiven.Sum(o => o.Value);
 
-        public Dictionary<int, float> DamagesTaken = new Dictionary<int, float>();
+        public Dictionary<int, float> DamagesTaken = new();
 
-        public Dictionary<int, float> DamagesGiven = new Dictionary<int, float>();
+        public Dictionary<int, float> DamagesGiven = new();
         public List<(int? playerNumber, int clock)> KillsDone { get; set; } = new List<(int?, int)>();
 
         public List<(int? playerNumber, int clock)> DeathsDone { get; set; } = new List<(int? playerNumber, int clock)>();

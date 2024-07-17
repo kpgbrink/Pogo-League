@@ -1,7 +1,5 @@
 ﻿using AutoLevelMenu;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -13,8 +11,9 @@ public class TimeText : MonoBehaviour
 
     public void SetText(int Time)
     {
-        var timeInSeconds = Time / Global.FixedTimeStep;
-        var timeSpan = TimeSpan.FromSeconds(timeInSeconds);
+        var timeInSeconds = (float)Time / (float)Global.FixedTimeStep;
+        var roundedTimeInSeconds = Math.Ceiling(timeInSeconds);
+        var timeSpan = TimeSpan.FromSeconds(roundedTimeInSeconds);
 
         var text = timeSpan.ToString(@"mm\:ss");
         if (tmp != null)

@@ -3,14 +3,9 @@ using AutoLevelMenu;
 using AutoLevelMenu.Enums;
 using AutoLevelMenu.Events;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.PackageManager.ValidationSuite;
 using UnityEngine;
-using UnityEngine.Events;
 
 /// <summary>
 /// 
@@ -39,7 +34,7 @@ public class GoalScoreDevice : MonoBehaviour
 
     [SerializeField]
     MeshRenderer meshRenderer;
-        
+
     [SerializeField]
     SphereCollider SphereCollider;
 
@@ -48,6 +43,9 @@ public class GoalScoreDevice : MonoBehaviour
 
     [SerializeField]
     private GameEvent goalEvent;
+
+    [SerializeField]
+    private GameEvent startGameCountdownTimer;
 
 
     private void Start()
@@ -112,6 +110,7 @@ public class GoalScoreDevice : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
         // Reset values on respawn
         RestValuesOnRespawn();
+        // Start waiting for collision and make the FixedUpdateClock start counting SetGoingGoing(true)
     }
 
     public void StartMoving()
@@ -129,6 +128,7 @@ public class GoalScoreDevice : MonoBehaviour
     // TODO make these values actually reset on spawn. This does not happen atm.
     class ResetableValuesOnRespawn
     {
+        public bool HasStartedCountdownTimer { get; set; } = false;
         public bool HasScored { get; set; } = false;
         //public Dictionary<Player, int> PlayerTimeTouched { get; set; } = new Dictionary<Player, int>();
         public List<PlayerHitData> PlayerHitDatas = new();
@@ -171,6 +171,17 @@ public class GoalScoreDevice : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         RecordPlayerHits(collision.transform);
+        HandleStartCountdownCheck();
+    }
+
+    private void HandleStartCountdownCheck()
+    {
+        if (!ResetValuesOnGoal.HasStartedCountdownTimer)
+        {
+            Debug.Log("start");
+            ResetValuesOnGoal.HasStartedCountdownTimer = true;
+            startGameCountdownTimer.Raise();
+        }
     }
 
     void OnTriggerStay(Collider other)
