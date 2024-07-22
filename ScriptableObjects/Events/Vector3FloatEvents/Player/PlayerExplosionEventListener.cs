@@ -21,7 +21,6 @@ namespace AutoLevelMenu.Events
 
         protected override void Handle(Vector3 explosionPosition, float explosionForce)
         {
-            Debug.Log("PlayerExplosionEventListener.Handle()");
             var direction = rb.position - explosionPosition;
             var distance = direction.magnitude;
 

@@ -47,6 +47,29 @@ public class GoalScoreDevice : MonoBehaviour
     [SerializeField]
     private GameEvent startGameCountdownTimer;
 
+    [SerializeField]
+    private GameEvent ballTouchedGroundToEndGame;
+
+    bool waitingForBallTouchGroundEndGame = false;
+
+    public void StartWaitingForBallToTouchGroundToEndGame()
+    {
+        waitingForBallTouchGroundEndGame = true;
+    }
+
+    void CheckBallTouchGroundOnWaitingToEndGame(Collision other)
+    {
+        if (!waitingForBallTouchGroundEndGame) return;
+        Debug.Log("Ball touched ground check");
+        if (!other.gameObject.TryGetComponent<CollisionEnter>(out var collisionEnter)) return;
+        var collisionEnterType = collisionEnter.collisionEnterType;
+        // Goal
+        var ground = collisionEnterType == collisionEnterTypes.ground;
+        if (ground)
+        {
+            ballTouchedGroundToEndGame.Raise();
+        }
+    }
 
     private void Start()
     {
@@ -159,6 +182,7 @@ public class GoalScoreDevice : MonoBehaviour
     {
         public CollisionEnterType teamGoal;
         public CollisionEnterType playerGoal;
+        public CollisionEnterType ground;
     }
     public CollisionEnterTypes collisionEnterTypes;
 
@@ -171,22 +195,29 @@ public class GoalScoreDevice : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         RecordPlayerHits(collision.transform);
-        HandleStartCountdownCheck();
+        HandleStartCountdownCheck(collision);
+        CheckBallTouchGroundOnWaitingToEndGame(collision);
     }
 
-    private void HandleStartCountdownCheck()
+    private void OnCollisionStay(Collision collision)
     {
-        if (!ResetValuesOnGoal.HasStartedCountdownTimer)
-        {
-            Debug.Log("start");
-            ResetValuesOnGoal.HasStartedCountdownTimer = true;
-            startGameCountdownTimer.Raise();
-        }
+        CheckBallTouchGroundOnWaitingToEndGame(collision);
+    }
+
+    private void HandleStartCountdownCheck(Collision collision)
+    {
+        if (ResetValuesOnGoal.HasStartedCountdownTimer) return;
+        // Check if it is hit by a player
+        if (!collision.transform.TryGetComponent<PlayerObject>(out var playerObject)) return;
+        // Check if the player object exits
+        if (playerObject == null) return;
+        //Debug.Log(playerObject.Player.PlayerName + " hit the ball");
+        ResetValuesOnGoal.HasStartedCountdownTimer = true;
+        startGameCountdownTimer.Raise();
     }
 
     void OnTriggerStay(Collider other)
     {
-        //Debug.Log($"Checking Trigger{other.GetComponent<Transform>()?.name}" ?? "null");
         var boxCollider = other as BoxCollider;
         var sphereCollider = GetComponent<SphereCollider>();
 
@@ -201,7 +232,6 @@ public class GoalScoreDevice : MonoBehaviour
 
     private void HandleCompleteOverlap(Collider other)
     {
-        //Debug.Log($"{other.name} is completely inside {name}");
         EnumCollision(other.transform);
     }
 

@@ -68,7 +68,6 @@ public class GameStartCountDown : MonoBehaviour
 
         if (countDownTimer.IsFinished())
         {
-            Debug.Log("countdown finished");
             gameStartEvent.Raise();
             goTextLingerTime.StartTimer();
             countDownTimer.StopTimer();

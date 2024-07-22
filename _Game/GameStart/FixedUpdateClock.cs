@@ -1,15 +1,35 @@
-﻿using UnityEngine;
+﻿using AutoLevelMenu.Events;
+using UnityEngine;
 
 public class FixedUpdateClock : MonoBehaviour
 {
     [SerializeField]
     TimeText[] timeTexts;
 
+    [SerializeField]
+    TimeText[] timerTexts;
+
     public bool GameCountdownGoing { get; private set; } = false;
     public bool GamePaused { get; private set; } = false;
     public bool GameEnded { get; private set; } = false;
     public bool GameWaitingForBallHit { get; private set; } = false;
     public int Clock { get; private set; }
+
+    // If zero don't use it
+    [SerializeField]
+    public int fixedUpdateClockMax = 0;
+
+    [SerializeField]
+    GameEvent startWaitingForBallToTouchGroundToEndGame;
+
+
+    [SerializeField]
+    PlayerScoreManager playerScoreManager;
+
+    int FixedUpdateCountdown { get; set; } = 0;
+
+    bool AlreadySetGameCountDownEnd { get; set; } = false;
+
 
     public class ResetableValuesOnSceneInit
     {
@@ -22,6 +42,11 @@ public class FixedUpdateClock : MonoBehaviour
     public void Start()
     {
         ResetValuesOnSceneInit = new ResetableValuesOnSceneInit();
+    }
+
+    void CountDownTimer()
+    {
+        FixedUpdateCountdown = fixedUpdateClockMax - Clock;
     }
 
     public void SetGameStarted()
@@ -57,19 +82,53 @@ public class FixedUpdateClock : MonoBehaviour
 
     public void SetGameWaitingForBallHit(bool waiting)
     {
-        Debug.Log("SetGameWaitingForBallHit: " + waiting);
         GameWaitingForBallHit = waiting;
     }
 
     void FixedUpdate()
     {
+        CountDownTimer();
         if (GameCountdownGoing && !GamePaused)
         {
             Clock++;
         }
+        // check if the fixedupdate clock is set to zero
+        if (fixedUpdateClockMax != 0 && Clock >= fixedUpdateClockMax)
+        {
+            GameCountdownGoing = false;
+            // Set the clock back 1 to keep it off of zero until the ball touches the ground
+            Clock = fixedUpdateClockMax - 1;
+            if (!AlreadySetGameCountDownEnd)
+            {
+                startWaitingForBallToTouchGroundToEndGame.Raise();
+                AlreadySetGameCountDownEnd = true;
+            }
+        }
+    }
+
+    public void OnBallTouchedGroundToEndGame()
+    {
+        Clock = fixedUpdateClockMax;
+        // RUn check if the game should end
+        playerScoreManager.CheckGameEnd();
+        // If the game should not end then we need to start the overtime. where it keeps going until the ball is scored
     }
 
     void Update()
+    {
+        UpdateTimerTexts();
+        UpdateTimeTexts();
+    }
+
+    void UpdateTimerTexts()
+    {
+        foreach (var timer in timerTexts)
+        {
+            timer.SetText(FixedUpdateCountdown);
+        }
+    }
+
+    void UpdateTimeTexts()
     {
         foreach (var timeText in timeTexts)
         {

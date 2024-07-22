@@ -1,7 +1,6 @@
 ﻿using Assets.Scripts;
 using Assets.Scripts.Extensions;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -94,7 +93,7 @@ public class PlayerSpawnManager : MonoBehaviour
                     }
                     var spawnIndex = ListSpawns[spawnListIndex][PlayerSpawnIndexes[spawnListIndex]];
                     PlayerSpawnIndexes[spawnListIndex]++;
-                    Debug.Log($"Spawn index {spawnIndex.position.x} {spawnIndex.position.y}");
+                    //Debug.Log($"Spawn index {spawnIndex.position.x} {spawnIndex.position.y}");
                     return spawnIndex;
                 });
             case SpawnTypes.FurthestFromAll:
@@ -193,7 +192,8 @@ public class PlayerSpawnManager : MonoBehaviour
                 {
                     // Set random player to zero then rerun this method.
                     FixTeams();
-                } else if(ListSpawns.Count == 1)
+                }
+                else if (ListSpawns.Count == 1)
                 {
                     // Already set one random person to team 0.
                 }

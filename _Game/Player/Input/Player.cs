@@ -283,8 +283,6 @@ public class Player : MonoBehaviour
         {
             // Reset the main object position and rotation
             existingObj.transform.SetPositionAndRotation(spawnTransform.position, spawnTransform.rotation);
-            Debug.Log("Existing Object New Position: " + existingObj.transform.position);
-
             // Reset the positions and velocities of the child objects
             foreach (Transform child in existingObj.transform)
             {
@@ -297,8 +295,6 @@ public class Player : MonoBehaviour
                     {
                         playerObj.PlayerInputTransform = transform;
                     }
-
-                    Debug.Log("Reset child object: " + child.name);
                 }
             }
 
@@ -397,7 +393,7 @@ public class Player : MonoBehaviour
 
     public void Respawn()
     {
-        Debug.Log("RESPAWN");
+        //Debug.Log("RESPAWN");
         Spawn(firstSpawn: false);
     }
 
@@ -407,7 +403,14 @@ public class Player : MonoBehaviour
         // are removed upon being destroyed.
         foreach (var playerControlledObject in PlayerControlledObjects.ToList())
         {
-            Destroy(playerControlledObject.transform.gameObject);
+            try
+            {
+                Destroy(playerControlledObject.transform.gameObject);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
         }
     }
 

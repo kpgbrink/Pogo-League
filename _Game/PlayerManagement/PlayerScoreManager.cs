@@ -1,8 +1,6 @@
 ﻿using Assets.Scripts;
-using AutoLevelMenu;
 using AutoLevelMenu.Events;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,10 +15,6 @@ public class PlayerScoreManager : MonoBehaviour
     [SerializeField]
     int maxPoints = 0;
 
-    // If zero don't use it
-    [SerializeField]
-    int fixedUpdateClockMax = 0;
-
     [SerializeField]
     bool overtime = true;
 
@@ -30,19 +24,9 @@ public class PlayerScoreManager : MonoBehaviour
     [SerializeField]
     ScoreText[] scoreTexts;
 
-    [SerializeField]
-    TimeText[] timerTexts;
-
     Scores Scores { get; set; } = new Scores();
 
-    [SerializeField]
-    FixedUpdateClock FixedUpdateClock;
-
     bool Overtime { get; set; } = false;
-
-    int FixedUpdateCountdown { get; set; } = 0;
-
-    bool AlreadySetGameCountDownEnd { get; set; } = false;
 
     IOnGameEnd GameEnd => GameObject.Find("/GameEnd").GetComponent<IOnGameEnd>();
 
@@ -53,37 +37,6 @@ public class PlayerScoreManager : MonoBehaviour
         Debug.Log($"add score\n team number: {teamNumber} player number: {playerNumber}");
         Scores.AddScore(teamNumber, playerNumber, addAmount);
         UpdateScoreTexts();
-    }
-
-    public void FixedUpdate()
-    {
-        CountDownTimer();
-    }
-
-    public void Update()
-    {
-        UpdateTimerTexts();
-    }
-
-    void UpdateTimerTexts()
-    {
-        if (GameEnd.GameEnded) return;
-        foreach (var timer in timerTexts)
-        {
-            timer.SetText(FixedUpdateCountdown);
-        }
-    }
-
-    void CountDownTimer()
-    {
-        if (fixedUpdateClockMax == 0) return;
-        FixedUpdateCountdown = fixedUpdateClockMax - FixedUpdateClock.Clock;
-        if (FixedUpdateCountdown <= 0 && !AlreadySetGameCountDownEnd)
-        {
-            AlreadySetGameCountDownEnd = true;
-            // Check if the game is ended on countdown ending.
-            CheckGameEnd();
-        }
     }
 
     public void UpdateScoreTexts()
@@ -100,8 +53,6 @@ public class PlayerScoreManager : MonoBehaviour
     {
         foreach (var scoreText in scoreTexts)
         {
-            Debug.Log("ScoreText" + getKey(scoreText));
-            Debug.Log("Score dictionary" + scores.ToString());
             // Try to find the score
             if (scores.TryGetValue(getKey(scoreText), out var teamScoreAmount))
             {
@@ -146,7 +97,7 @@ public class PlayerScoreManager : MonoBehaviour
     {
         // Get all that are still alive. Check if they are all on the same team 
         var notCompletelyDeadPlayers = playerSparData.PlayerSpars.Where(p => p.GetComponent<Player>().ResetValuesOnSceneInit.CompletelyDead == false).ToList();
-        Debug.Log(notCompletelyDeadPlayers.Count);
+        //Debug.Log(notCompletelyDeadPlayers.Count);
         // What if everyone is dead. No one wins but game is over.
         if (notCompletelyDeadPlayers.Count == 0)
         {
@@ -212,7 +163,7 @@ public class PlayerScoreManager : MonoBehaviour
                 if (topPlayerScore > topTeamScore)
                 {
                     return ReturnPlayers(TopPlayerScoresSpars());
-                }  
+                }
                 else if (topTeamScore > topPlayerScore)
                 {
                     return ReturnPlayers(TopTeamPlayerScoresSpars());

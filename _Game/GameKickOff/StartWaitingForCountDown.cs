@@ -24,7 +24,6 @@ namespace Assets.Scripts._Game.GameStart
             countDownTimer.CountDown(multiplyCountDown);
             if (countDownTimer.IsFinished())
             {
-                Debug.Log("countdown finished");
                 startCountdownTimerEvent.Raise();
                 gameObject.SetActive(false);
             }

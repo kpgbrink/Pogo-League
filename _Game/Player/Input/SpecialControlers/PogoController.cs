@@ -34,13 +34,10 @@ public class PogoController : PlayerInputBase
 
     public void Start()
     {
-        Debug.Log(configurableJoint);
-
         // A player could spawn during countdown, so we need to wait for kickoff if it in that setting.
         // This will make the player wait for kickoff. But also freeze the player before the hmm
         if (gameStartCountDown != null && !gameStartCountDown.GetCountDownTimerFinished())
         {
-            Debug.Log("Freeeeeeeeeeeeeeeze");
             WaitForKickOff();
         }
     }
