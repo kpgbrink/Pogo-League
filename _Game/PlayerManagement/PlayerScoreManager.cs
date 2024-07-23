@@ -61,7 +61,7 @@ public class PlayerScoreManager : MonoBehaviour
         }
     }
 
-    public void CheckGameEnd()
+    public void OnCheckGameEnd()
     {
         // Check if game is in win state
         var (gameEndState, playerSpars) = FuncUtil.Invoke(() =>
@@ -79,7 +79,7 @@ public class PlayerScoreManager : MonoBehaviour
             // For end game I will have it take all the winning players
             // Do something special to them on win
             // Everyone will be respawned but maybe into a special thing?
-            // I will have an onWin thing for each people
+            // I will have an on win thing for each people
             // IOnWin
             // IOnLose
             GameEnd.OnGameEnd(

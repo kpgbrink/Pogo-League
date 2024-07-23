@@ -110,7 +110,7 @@ public class FixedUpdateClock : MonoBehaviour
     {
         Clock = fixedUpdateClockMax;
         // RUn check if the game should end
-        playerScoreManager.CheckGameEnd();
+        playerScoreManager.OnCheckGameEnd();
         // If the game should not end then we need to start the overtime. where it keeps going until the ball is scored
     }
 

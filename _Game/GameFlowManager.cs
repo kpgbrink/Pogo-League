@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using Assets.Scripts._Game.GameStart;
 using AutoLevelMenu.Events;
-using Assets.Scripts._Game.GameStart;
+using UnityEngine;
 
 /// <summary>
 /// This kinda just makes timers run when they can't listen to things because they are inactived.
@@ -37,7 +36,7 @@ public class GameFlowManager : MonoBehaviour
         startWaitingForCountDown.StartCountdown();
     }
 
-    public void StartCountDown()
+    public void OnStartCountDown()
     {
         gameStartCountDown.StartCountdown();
     }

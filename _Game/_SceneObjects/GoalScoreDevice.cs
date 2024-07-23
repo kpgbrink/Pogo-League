@@ -52,7 +52,7 @@ public class GoalScoreDevice : MonoBehaviour
 
     bool waitingForBallTouchGroundEndGame = false;
 
-    public void StartWaitingForBallToTouchGroundToEndGame()
+    public void OnStartWaitingForBallToTouchGroundToEndGame()
     {
         waitingForBallTouchGroundEndGame = true;
     }
@@ -60,7 +60,6 @@ public class GoalScoreDevice : MonoBehaviour
     void CheckBallTouchGroundOnWaitingToEndGame(Collision other)
     {
         if (!waitingForBallTouchGroundEndGame) return;
-        Debug.Log("Ball touched ground check");
         if (!other.gameObject.TryGetComponent<CollisionEnter>(out var collisionEnter)) return;
         var collisionEnterType = collisionEnter.collisionEnterType;
         // Goal
@@ -122,7 +121,7 @@ public class GoalScoreDevice : MonoBehaviour
         SphereCollider.enabled = collidable;
     }
 
-    public void Respawn()
+    public void OnRespawn()
     {
         SetVisibleAndCollidable(true, true);
         // Set back to original location.
@@ -132,11 +131,11 @@ public class GoalScoreDevice : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         // Reset values on respawn
-        RestValuesOnRespawn();
+        OnResetValuesOnRespawn();
         // Start waiting for collision and make the FixedUpdateClock start counting SetGoingGoing(true)
     }
 
-    public void StartMoving()
+    public void OnStartMoving()
     {
         UnFreeze();
     }
@@ -247,7 +246,7 @@ public class GoalScoreDevice : MonoBehaviour
     }
 
     // Use Respawn Event to call this
-    public void RestValuesOnRespawn()
+    public void OnResetValuesOnRespawn()
     {
         ResetValuesOnGoal = new ResetableValuesOnRespawn();
     }
