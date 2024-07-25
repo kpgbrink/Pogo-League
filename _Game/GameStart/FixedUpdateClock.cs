@@ -9,6 +9,7 @@ public class FixedUpdateClock : MonoBehaviour
     [SerializeField]
     TimeText[] timerTexts;
 
+    public bool IsOvertime { get; private set; } = false;
     public bool GameCountdownGoing { get; private set; } = false;
     public bool GamePaused { get; private set; } = false;
     public bool GameEnded { get; private set; } = false;
@@ -22,11 +23,19 @@ public class FixedUpdateClock : MonoBehaviour
     [SerializeField]
     GameEvent startWaitingForBallToTouchGroundToEndGame;
 
+    [SerializeField]
+    GameEvent startOvertime;
 
     [SerializeField]
     PlayerScoreManager playerScoreManager;
 
-    int FixedUpdateCountdown { get; set; } = 0;
+    public int FixedUpdateCountdown
+    {
+        get
+        {
+            return fixedUpdateClockMax - Clock;
+        }
+    }
 
     bool AlreadySetGameCountDownEnd { get; set; } = false;
 
@@ -44,34 +53,29 @@ public class FixedUpdateClock : MonoBehaviour
         ResetValuesOnSceneInit = new ResetableValuesOnSceneInit();
     }
 
-    void CountDownTimer()
-    {
-        FixedUpdateCountdown = fixedUpdateClockMax - Clock;
-    }
-
-    public void SetGameStarted()
+    public void OnSetGameStarted()
     {
         GamePaused = false;
         ResetValuesOnSceneInit.GameBeforeStart = false;
     }
 
-    public void StopGameCountdown()
+    public void OnStopGameCountdown()
     {
         GameCountdownGoing = false;
     }
 
-    public void StartGameCountdown()
+    public void OnStartGameCountdown()
     {
         GameCountdownGoing = true;
     }
 
-    public void SetGamePause(bool pause)
+    public void OnSetGamePause(bool pause)
     {
         GamePaused = pause;
         GameCountdownGoing = !pause;
     }
 
-    public void SetGameEnd(bool end)
+    public void OnSetGameEnd(bool end)
     {
         GameEnded = end;
         if (end)
@@ -80,14 +84,13 @@ public class FixedUpdateClock : MonoBehaviour
         }
     }
 
-    public void SetGameWaitingForBallHit(bool waiting)
+    public void OnSetGameWaitingForBallHit(bool waiting)
     {
         GameWaitingForBallHit = waiting;
     }
 
     void FixedUpdate()
     {
-        CountDownTimer();
         if (GameCountdownGoing && !GamePaused)
         {
             Clock++;
@@ -95,26 +98,55 @@ public class FixedUpdateClock : MonoBehaviour
         // check if the fixedupdate clock is set to zero
         if (fixedUpdateClockMax != 0 && Clock >= fixedUpdateClockMax)
         {
-            GameCountdownGoing = false;
             // Set the clock back 1 to keep it off of zero until the ball touches the ground
-            Clock = fixedUpdateClockMax - 1;
             if (!AlreadySetGameCountDownEnd)
             {
+                GameCountdownGoing = false;
+                Clock = fixedUpdateClockMax - 1;
                 startWaitingForBallToTouchGroundToEndGame.Raise();
                 AlreadySetGameCountDownEnd = true;
             }
         }
     }
 
-    public void OnBallTouchedGroundToEndGame()
+
+    public void OnBallTouchedGroundOrScoredToEndGame()
     {
         Clock = fixedUpdateClockMax;
-        // RUn check if the game should end
-        playerScoreManager.OnCheckGameEnd();
-        // If the game should not end then we need to start the overtime. where it keeps going until the ball is scored
+        // Run check if the game should end
+        var gameEndState = playerScoreManager.OnCheckGameEnd();
+        // If the game should not end then we need to start the overtime. where it keeps going until the ball is scored.
+        if (gameEndState.HasValue)
+        {
+            OnSetGameEnd(true);
+        }
+        // If the game should end then we need to end the game.
+        else
+        {
+            StartOvertime();
+        }
+    }
+
+    public void OnBallScoredInOvertimeToEndGame()
+    {
+        var gameEndState = playerScoreManager.OnCheckGameEnd();
+        OnSetGameEnd(true);
+    }
+
+    void StartOvertime()
+    {
+        // Raise overtime event
+        startOvertime.Raise();
+        IsOvertime = true;
+        GameCountdownGoing = true;
     }
 
     void Update()
+    {
+        UpdateTexts();
+    }
+
+    void UpdateTexts()
     {
         UpdateTimerTexts();
         UpdateTimeTexts();

@@ -61,7 +61,7 @@ public class PlayerScoreManager : MonoBehaviour
         }
     }
 
-    public void OnCheckGameEnd()
+    public GameEndStates? OnCheckGameEnd()
     {
         // Check if game is in win state
         var (gameEndState, playerSpars) = FuncUtil.Invoke(() =>
@@ -87,6 +87,7 @@ public class PlayerScoreManager : MonoBehaviour
                 playerSpars);
             gameEndEvent.Raise();
         }
+        return gameEndState;
     }
 
     /// <summary>

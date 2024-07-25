@@ -48,25 +48,42 @@ public class GoalScoreDevice : MonoBehaviour
     private GameEvent startGameCountdownTimer;
 
     [SerializeField]
-    private GameEvent ballTouchedGroundToEndGame;
+    private GameEvent ballTouchedGroundOrScoredToEndGame;
 
-    bool waitingForBallTouchGroundEndGame = false;
+    [SerializeField]
+    private GameEvent ballScoredInOvertimeToEndGame;
 
-    public void OnStartWaitingForBallToTouchGroundToEndGame()
+    bool waitingForBallTouchGroundOrScoredToEndGame = false;
+
+    bool waitingForBallToScoreToEndGame = false;
+
+    public void OnStartOvertime()
     {
-        waitingForBallTouchGroundEndGame = true;
+        // Freeze the ball
+        waitingForBallToScoreToEndGame = true;
+        Freeze();
+    }
+
+    // this is called multiple times. that has to stop.
+    public void OnStartWaitingForBallToTouchGroundOrScoredToEndGame()
+    {
+        waitingForBallTouchGroundOrScoredToEndGame = true;
     }
 
     void CheckBallTouchGroundOnWaitingToEndGame(Collision other)
     {
-        if (!waitingForBallTouchGroundEndGame) return;
+        if (!waitingForBallTouchGroundOrScoredToEndGame)
+        {
+            return;
+        }
         if (!other.gameObject.TryGetComponent<CollisionEnter>(out var collisionEnter)) return;
         var collisionEnterType = collisionEnter.collisionEnterType;
         // Goal
         var ground = collisionEnterType == collisionEnterTypes.ground;
         if (ground)
         {
-            ballTouchedGroundToEndGame.Raise();
+            waitingForBallTouchGroundOrScoredToEndGame = false;
+            ballTouchedGroundOrScoredToEndGame.Raise();
         }
     }
 
@@ -266,6 +283,15 @@ public class GoalScoreDevice : MonoBehaviour
 
     void GoalScored(bool playerGoal, bool teamGoal, CollisionEnter collisionEnter)
     {
+        // If the ball touched ground to end the game is active then need to check if the game has ended. And if it has not then need to start the overtime.
+        if (waitingForBallTouchGroundOrScoredToEndGame)
+        {
+            ballTouchedGroundOrScoredToEndGame.Raise();
+        }
+        if (waitingForBallToScoreToEndGame)
+        {
+            ballScoredInOvertimeToEndGame.Raise();
+        }
         // Trigger explosion
         TriggerExplosion(transform.position, transform.rotation, rb.linearVelocity.magnitude);
         // Blast players away from the explosion

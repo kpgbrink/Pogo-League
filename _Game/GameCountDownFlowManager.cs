@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// This kinda just makes timers run when they can't listen to things because they are inactived.
 /// </summary>
-public class GameFlowManager : MonoBehaviour
+public class GameCountDownFlowManager : MonoBehaviour
 {
     [SerializeField]
     private GameStartCountDown gameStartCountDown;
@@ -21,6 +21,12 @@ public class GameFlowManager : MonoBehaviour
 
     [SerializeField]
     GameEvent gamePauseEvent;
+
+    public void OnStartOvertime()
+    {
+        gamePauseEvent.Raise();
+        StartWaitingForCountdown();
+    }
 
     public void OnGoal()
     {

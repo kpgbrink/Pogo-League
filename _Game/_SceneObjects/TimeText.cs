@@ -15,7 +15,11 @@ public class TimeText : MonoBehaviour
         var roundedTimeInSeconds = Math.Ceiling(timeInSeconds);
         var timeSpan = TimeSpan.FromSeconds(roundedTimeInSeconds);
 
-        var text = timeSpan.ToString(@"mm\:ss");
+        var text = timeSpan.ToString(@"m\:ss");
+        if (Time < 0)
+        {
+            text = $"+{text}";
+        }
         if (tmp != null)
         {
             tmp.text = text;
