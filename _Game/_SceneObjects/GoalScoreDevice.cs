@@ -203,7 +203,7 @@ public class GoalScoreDevice : MonoBehaviour
     public CollisionEnterTypes collisionEnterTypes;
 
     [SerializeField]
-    PlayerScoreManager playerScoreManager;
+    ScoreManager playerScoreManager;
 
     [SerializeField]
     PlayerSparData playerSparData;

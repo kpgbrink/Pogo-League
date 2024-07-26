@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class SimpleGameEnd : MonoBehaviour, IOnGameEnd
+public class SimpleGameEnd : GameEnd
 {
     [SerializeField]
     CountDownTimer ToDataScreenTimer;
@@ -12,16 +12,13 @@ public class SimpleGameEnd : MonoBehaviour, IOnGameEnd
 
     public GameObject gameDataEnd;
 
-    public bool GameEnded { get; set; }
-
     public void Start()
     {
         ToDataScreenTimer.StopTimer();
     }
 
-    public void OnGameEnd(GameEndStates gameEndState, List<PlayerSpar> playerSparsWinner)
+    public override void OnGameEnd(GameEndStates gameEndState, List<PlayerSpar> playerSparsWinner)
     {
-        GameEnded = true;
         winnerText.SetActive(true);
         playerSparData.Players.ForEach(player =>
         {
