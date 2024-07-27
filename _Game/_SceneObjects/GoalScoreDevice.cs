@@ -283,15 +283,6 @@ public class GoalScoreDevice : MonoBehaviour
 
     void GoalScored(bool playerGoal, bool teamGoal, CollisionEnter collisionEnter)
     {
-        // If the ball touched ground to end the game is active then need to check if the game has ended. And if it has not then need to start the overtime.
-        if (waitingForBallTouchGroundOrScoredToEndGame)
-        {
-            ballTouchedGroundOrScoredToEndGame.Raise();
-        }
-        if (waitingForBallToScoreToEndGame)
-        {
-            ballScoredInOvertimeToEndGame.Raise();
-        }
         // Trigger explosion
         TriggerExplosion(transform.position, transform.rotation, rb.linearVelocity.magnitude);
         // Blast players away from the explosion
@@ -305,6 +296,17 @@ public class GoalScoreDevice : MonoBehaviour
         // Start respawn timer
         Freeze();
         SetVisibleAndCollidable(false, false);
+
+        // If the ball touched ground to end the game is active then need to check if the game has ended. And if it has not then need to start the overtime.
+        // This has to happen at the end because the score needs to be counted before you can check if the game has ended.
+        if (waitingForBallTouchGroundOrScoredToEndGame)
+        {
+            ballTouchedGroundOrScoredToEndGame.Raise();
+        }
+        if (waitingForBallToScoreToEndGame)
+        {
+            ballScoredInOvertimeToEndGame.Raise();
+        }
     }
 
     private void HandleGoalScorePoint(bool teamGoal, bool playerGoal, CollisionEnter collisionEnter)
