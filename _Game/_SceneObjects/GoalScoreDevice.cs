@@ -287,8 +287,12 @@ public class GoalScoreDevice : MonoBehaviour
         TriggerExplosion(transform.position, transform.rotation, rb.linearVelocity.magnitude);
         // Blast players away from the explosion
         BlastPlayers(transform.position, rb.linearVelocity.magnitude);
-        // Raise goal event
-        goalEvent.Raise();
+
+        if (!waitingForBallTouchGroundOrScoredToEndGame && !waitingForBallToScoreToEndGame)
+        {
+            // Raise goal event
+            goalEvent.Raise();
+        }
 
         ResetValuesOnGoal.HasScored = true;
         HandleGoalScorePoint(playerGoal: playerGoal, teamGoal: teamGoal, collisionEnter: collisionEnter);

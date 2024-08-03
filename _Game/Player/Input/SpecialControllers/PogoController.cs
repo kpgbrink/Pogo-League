@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PogoController : PlayerInputBase
+public class PogoController : PlayerInputBase, Freezable
 {
     [SerializeField]
     HingeJoint hinge;
@@ -57,6 +57,16 @@ public class PogoController : PlayerInputBase
     public void KickOff()
     {
         IsWaitingForKickoff = false;
+        UnFreezeRigidBodies();
+    }
+
+    public void Freeze()
+    {
+        FreezeRigidBodies();
+    }
+
+    public void Unfreeze()
+    {
         UnFreezeRigidBodies();
     }
 

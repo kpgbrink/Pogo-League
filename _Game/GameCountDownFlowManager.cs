@@ -37,6 +37,7 @@ public class GameCountDownFlowManager : MonoBehaviour
 
     public void StartWaitingForCountdown()
     {
+        // If the game is over, don't start the countdown
         startWaitingForCountdownEvent.Raise();
         // Another game object with a timer will have the timer to start waiting for countdown
         startWaitingForCountDown.StartCountdown();

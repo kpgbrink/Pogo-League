@@ -28,6 +28,9 @@ public class FixedUpdateClock : MonoBehaviour
     [SerializeField]
     ScoreManager playerScoreManager;
 
+    [SerializeField]
+    GameEvent gameEndEvent;
+
     public int FixedUpdateCountdown
     {
         get
@@ -81,6 +84,14 @@ public class FixedUpdateClock : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!ResetValuesOnSceneInit.GameAfterEnd)
+        {
+            ClockCounting();
+        }
+    }
+
+    void ClockCounting()
+    {
         if (GameCountdownGoing && !GamePaused)
         {
             Clock++;
@@ -102,30 +113,28 @@ public class FixedUpdateClock : MonoBehaviour
     public void OnBallTouchedGroundOrScoredToEndGame()
     {
         Clock = fixedUpdateClockMax;
+        MaybeSetGameEnd();
+    }
+
+    public void OnBallScoredInOvertimeToEndGame()
+    {
+        MaybeSetGameEnd();
+    }
+
+    void MaybeSetGameEnd()
+    {
         // Run check if the game should end
         var gameEndState = playerScoreManager.OnCheckGameEnd();
         // If the game should not end then we need to start the overtime. where it keeps going until the ball is scored.
         if (gameEndState.HasValue)
         {
-            SetGameEnd();
+            ResetValuesOnSceneInit.GameAfterEnd = true;
         }
         // If the game should end then we need to end the game.
         else
         {
             StartOvertime();
         }
-    }
-
-    public void OnBallScoredInOvertimeToEndGame()
-    {
-        var gameEndState = playerScoreManager.OnCheckGameEnd();
-        SetGameEnd();
-    }
-
-    void SetGameEnd()
-    {
-        ResetValuesOnSceneInit.GameAfterEnd = true;
-
     }
 
     void StartOvertime()
