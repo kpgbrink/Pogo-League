@@ -9,6 +9,7 @@ public class TeamScoreGameEnd : GameEnd
     public PlayerSparData playerSparData;
     public TeamPlayerManager teamPlayerManager;
     public GameObject winnerText;
+    public GameObject gameOverText;
     public GameObject gameDataEnd;
 
     public StateMachine<TeamScoreGameEnd> StateMachine { get; private set; }

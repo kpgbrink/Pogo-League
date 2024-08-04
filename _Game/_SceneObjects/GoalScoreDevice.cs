@@ -82,6 +82,7 @@ public class GoalScoreDevice : MonoBehaviour
         var ground = collisionEnterType == collisionEnterTypes.ground;
         if (ground)
         {
+            Freeze();
             waitingForBallTouchGroundOrScoredToEndGame = false;
             ballTouchedGroundOrScoredToEndGame.Raise();
         }
@@ -305,6 +306,7 @@ public class GoalScoreDevice : MonoBehaviour
         // This has to happen at the end because the score needs to be counted before you can check if the game has ended.
         if (waitingForBallTouchGroundOrScoredToEndGame)
         {
+            waitingForBallTouchGroundOrScoredToEndGame = false;
             ballTouchedGroundOrScoredToEndGame.Raise();
         }
         if (waitingForBallToScoreToEndGame)
