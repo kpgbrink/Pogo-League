@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts._Game.PlayerManagement;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class TeamScoreGameEnd : GameEnd
@@ -9,8 +10,13 @@ public class TeamScoreGameEnd : GameEnd
     public PlayerSparData playerSparData;
     public TeamPlayerManager teamPlayerManager;
     public GameObject winnerText;
+    public TextMeshProUGUI winnerTextMeshPro;
     public GameObject gameOverText;
     public GameObject gameDataEnd;
+
+    public int WinningTeam { get; set; }
+
+    public List<PlayerSpar> PlayerSparsWinner { get; set; }
 
     public StateMachine<TeamScoreGameEnd> StateMachine { get; private set; }
 
@@ -29,6 +35,9 @@ public class TeamScoreGameEnd : GameEnd
         // The ending scores pop up: players can't move - 3 seconds
         // Press A to continue: now you can leave the game
         StateMachine.ChangeState(new FreezePlayersState());
+        PlayerSparsWinner = playerSparsWinner;
+
+        WinningTeam = playerSparsWinner[0].Team;
     }
 
     private void Update()

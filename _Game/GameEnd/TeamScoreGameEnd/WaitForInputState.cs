@@ -1,5 +1,6 @@
 ﻿public class WaitForInputState : IState<TeamScoreGameEnd>
 {
+    // Wait for input to go back to the main menu here
     public void Enter(TeamScoreGameEnd context)
     {
         // Press A to continue: now you can leave the game

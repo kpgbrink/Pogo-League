@@ -1,7 +1,7 @@
 ﻿
 public class FreezePlayersState : IState<TeamScoreGameEnd>
 {
-    CountDownTimer freezeDurationTimer;
+    public CountDownTimer countDownTimer = new(100);
 
     public void Enter(TeamScoreGameEnd context)
     {
@@ -12,17 +12,22 @@ public class FreezePlayersState : IState<TeamScoreGameEnd>
         //    player.DestroyAllPlayerControlledObjects();
         //});
         context.teamPlayerManager.FreezeAllPlayers();
+        countDownTimer.StartTimer();
     }
 
     public void Update(TeamScoreGameEnd context)
     {
         // Transition to ShowGameOverState after some condition, e.g., a timer
-        context.StateMachine.ChangeState(new ShowGameOverState());
     }
 
     public void FixedUpdate(TeamScoreGameEnd context)
     {
         // Handle FixedUpdate logic if needed
+        countDownTimer.CountDown();
+        if (countDownTimer.IsFinished())
+        {
+            context.StateMachine.ChangeState(new ShowGameOverState());
+        }
     }
 
     public void Exit(TeamScoreGameEnd context)
