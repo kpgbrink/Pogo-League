@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AllowWinningTeamMovementState : IState<TeamScoreGameEnd>
 {
-    public CountDownTimer countDownTimer = new(100);
+    public CountDownTimer countDownTimer = new(0);
     public void Enter(TeamScoreGameEnd context)
     {
         // Blue/Red team wins: The team that wins can move for 3 seconds - 5 seconds

@@ -2,7 +2,7 @@
 
 public class ShowGameOverState : IState<TeamScoreGameEnd>
 {
-    public CountDownTimer countDownTimer = new(200);
+    public CountDownTimer countDownTimer = new(100);
     public void Enter(TeamScoreGameEnd context)
     {
         // Show GAME OVER -- 3 seconds

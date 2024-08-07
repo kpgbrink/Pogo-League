@@ -1,6 +1,4 @@
 ﻿using Assets.Scripts._Game.PlayerManagement;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -49,8 +47,12 @@ public class PlayerSpar : MonoBehaviour
     // Resets on scene change
     public class ResetableValues
     {
-        public int Wins { get; set; }
-        public int Loses { get; set; }
+        public int Goals { get; set; }
+        public int Assists { get; set; }
+        public int Saves { get; set; } // Do this last. Just ignore it for now.
+        public int Shots { get; set; }
+        public int BallTouches { get; set; }
+        public float AverageDistanceToBall { get; set; }
     }
     public ResetableValues ResetValues { get; set; }
 

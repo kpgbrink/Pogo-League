@@ -5,15 +5,21 @@
     /// 
     /// Goals: 
     /// Assists:
-    /// Saves:
+    /// Saves: -- this is hard figure it out later
+    /// Shots: -- this will be hard figure it out later
     /// Ball Touches:
     /// Average distance from ball:
     /// </summary>
     /// <param name="context"></param>
+    /// 
+
+    public CountDownTimer countDownTimer = new(300);
     public void Enter(TeamScoreGameEnd context)
     {
         // The ending scores pop up: players can't move - 3 seconds
         // Implement logic to display scores
+
+        countDownTimer.StartTimer();
     }
 
     public void Update(TeamScoreGameEnd context)
@@ -25,6 +31,11 @@
     public void FixedUpdate(TeamScoreGameEnd context)
     {
         // Handle FixedUpdate logic if needed
+        countDownTimer.CountDown();
+        if (countDownTimer.IsFinished())
+        {
+            context.StateMachine.ChangeState(new WaitForInputState());
+        }
     }
 
     public void Exit(TeamScoreGameEnd context)

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 public class ShowWhoOneState : IState<TeamScoreGameEnd>
 {
-    public CountDownTimer countDownTimer = new(300);
+    public CountDownTimer countDownTimer = new(400);
     public void Enter(TeamScoreGameEnd context)
     {
         // Blue/Red team wins: The team that wins can move for 3 seconds - 5 seconds

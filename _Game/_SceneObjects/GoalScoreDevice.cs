@@ -57,6 +57,22 @@ public class GoalScoreDevice : MonoBehaviour
 
     bool waitingForBallToScoreToEndGame = false;
 
+
+    /// <summary>
+    /// This is test to get the variable I would have to change for the stats. One example is the goals
+    /// </summary>
+    public void PlayerSparTest()
+    {
+        playerSparData.PlayerSpars.ForEach(ps =>
+        {
+            Debug.Log(ps.ResetValues.Goals);
+        });
+        playerSparData.Players.ForEach(p =>
+        {
+            p.playerSpar.ResetValues.Goals = 0;
+        });
+    }
+
     public void OnStartOvertime()
     {
         // Freeze the ball

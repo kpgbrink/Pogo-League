@@ -1,7 +1,7 @@
 ﻿
 public class FreezePlayersState : IState<TeamScoreGameEnd>
 {
-    public CountDownTimer countDownTimer = new(100);
+    public CountDownTimer countDownTimer = new(0);
 
     public void Enter(TeamScoreGameEnd context)
     {
