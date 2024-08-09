@@ -1,16 +1,12 @@
-﻿using Assets.Scripts;
-using AutoLevelMenu;
+﻿using AutoLevelMenu;
 using AutoLevelMenu.Enums;
 using AutoLevelMenu.Events;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
 /// 
 /// </summary>
-/// 
 // Require rigidbody to be able to reset physics
 [RequireComponent(typeof(Rigidbody))]
 public class GoalScoreDevice : MonoBehaviour
@@ -42,9 +38,6 @@ public class GoalScoreDevice : MonoBehaviour
     private Vector3FloatGameEvent explosionEvent;
 
     [SerializeField]
-    private GameEvent goalEvent;
-
-    [SerializeField]
     private GameEvent startGameCountdownTimer;
 
     [SerializeField]
@@ -53,10 +46,18 @@ public class GoalScoreDevice : MonoBehaviour
     [SerializeField]
     private GameEvent ballScoredInOvertimeToEndGame;
 
-    bool waitingForBallTouchGroundOrScoredToEndGame = false;
+    [SerializeField]
+    GoalScoreDeviceGameManager goalScoreDeviceGameManager;
 
-    bool waitingForBallToScoreToEndGame = false;
 
+    [Serializable]
+    public class CollisionEnterTypes
+    {
+        public CollisionEnterType teamGoal;
+        public CollisionEnterType playerGoal;
+        public CollisionEnterType ground;
+    }
+    public CollisionEnterTypes collisionEnterTypes;
 
     /// <summary>
     /// This is test to get the variable I would have to change for the stats. One example is the goals
@@ -76,31 +77,22 @@ public class GoalScoreDevice : MonoBehaviour
     public void OnStartOvertime()
     {
         // Freeze the ball
-        waitingForBallToScoreToEndGame = true;
         Freeze();
-    }
-
-    // this is called multiple times. that has to stop.
-    public void OnStartWaitingForBallToTouchGroundOrScoredToEndGame()
-    {
-        waitingForBallTouchGroundOrScoredToEndGame = true;
     }
 
     void CheckBallTouchGroundOnWaitingToEndGame(Collision other)
     {
-        if (!waitingForBallTouchGroundOrScoredToEndGame)
+        if (!goalScoreDeviceGameManager.waitingForBallTouchGroundOrScoredToEndGame)  // Check the state from BallGameManager
         {
             return;
         }
         if (!other.gameObject.TryGetComponent<CollisionEnter>(out var collisionEnter)) return;
         var collisionEnterType = collisionEnter.collisionEnterType;
-        // Goal
-        var ground = collisionEnterType == collisionEnterTypes.ground;
-        if (ground)
+        if (collisionEnterType == collisionEnterTypes.ground)  // Use CollisionEnterTypes from BallGameManager
         {
             Freeze();
-            waitingForBallTouchGroundOrScoredToEndGame = false;
-            ballTouchedGroundOrScoredToEndGame.Raise();
+            goalScoreDeviceGameManager.waitingForBallTouchGroundOrScoredToEndGame = false;  // Update state in BallGameManager
+            goalScoreDeviceGameManager.RaiseBallTouchedGroundOrScoredToEndGameEvent();  // Raise the event from BallGameManager
         }
     }
 
@@ -165,8 +157,7 @@ public class GoalScoreDevice : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         // Reset values on respawn
-        OnResetValuesOnRespawn();
-        // Start waiting for collision and make the FixedUpdateClock start counting SetGoingGoing(true)
+        goalScoreDeviceGameManager.ResetValuesOnRespawn();
     }
 
     public void OnStartMoving()
@@ -174,79 +165,21 @@ public class GoalScoreDevice : MonoBehaviour
         UnFreeze();
     }
 
-    class PlayerHitData
-    {
-        public int TimeTouched { get; set; }
-        public Player Player { get; set; }
-        public PlayerSpar PlayerSpar { get; set; }
-    }
-
-    // TODO make these values actually reset on spawn. This does not happen atm.
-    class ResetableValuesOnRespawn
-    {
-        public bool HasStartedCountdownTimer { get; set; } = false;
-        public bool HasScored { get; set; } = false;
-        //public Dictionary<Player, int> PlayerTimeTouched { get; set; } = new Dictionary<Player, int>();
-        public List<PlayerHitData> PlayerHitDatas = new();
-
-        /// <summary>
-        /// Gets last hit player data for player not on the team of the goal that was scored or player of the goal that was scored.
-        /// </summary>
-        /// <param name="team"></param>
-        public PlayerHitData GetLastHitPlayerData(int? goalTeam, int? playerNumber)
-        {
-            if (goalTeam != null)
-            {
-                return PlayerHitDatas.Where(ph => ph.PlayerSpar.Team != goalTeam).LastOrDefault();
-            }
-            if (playerNumber != null)
-            {
-                return PlayerHitDatas.Where(ph => ph.Player.PlayerNumber != playerNumber).LastOrDefault();
-            }
-            // Just return the last hit player data
-            return PlayerHitDatas.LastOrDefault();
-        }
-    }
-
-    ResetableValuesOnRespawn ResetValuesOnGoal { get; set; } = new ResetableValuesOnRespawn();
-
-    [Serializable]
-    public class CollisionEnterTypes
-    {
-        public CollisionEnterType teamGoal;
-        public CollisionEnterType playerGoal;
-        public CollisionEnterType ground;
-    }
-    public CollisionEnterTypes collisionEnterTypes;
-
-    [SerializeField]
-    ScoreManager playerScoreManager;
-
     [SerializeField]
     PlayerSparData playerSparData;
 
     void OnCollisionEnter(Collision collision)
     {
-        RecordPlayerHits(collision.transform);
-        HandleStartCountdownCheck(collision);
+        if (collision.transform.TryGetComponent<PlayerObject>(out var playerObject))
+        {
+            goalScoreDeviceGameManager.HandleStartCountdownCheck(playerObject);
+        }
         CheckBallTouchGroundOnWaitingToEndGame(collision);
     }
 
     private void OnCollisionStay(Collision collision)
     {
         CheckBallTouchGroundOnWaitingToEndGame(collision);
-    }
-
-    private void HandleStartCountdownCheck(Collision collision)
-    {
-        if (ResetValuesOnGoal.HasStartedCountdownTimer) return;
-        // Check if it is hit by a player
-        if (!collision.transform.TryGetComponent<PlayerObject>(out var playerObject)) return;
-        // Check if the player object exits
-        if (playerObject == null) return;
-        //Debug.Log(playerObject.Player.PlayerName + " hit the ball");
-        ResetValuesOnGoal.HasStartedCountdownTimer = true;
-        startGameCountdownTimer.Raise();
     }
 
     void OnTriggerStay(Collider other)
@@ -265,34 +198,17 @@ public class GoalScoreDevice : MonoBehaviour
 
     private void HandleCompleteOverlap(Collider other)
     {
-        EnumCollision(other.transform);
+        GoalScore(other.transform);
     }
 
-    void RecordPlayerHits(Transform other)
-    {
-        if (!other.TryGetComponent<PlayerObject>(out var playerObject)) return;
-        ResetValuesOnGoal.PlayerHitDatas.Add(new PlayerHitData()
-        {
-            TimeTouched = FixedUpdateClock.Clock,
-            Player = playerObject.Player,
-            PlayerSpar = playerObject.PlayerSpar,
-        });
-    }
-
-    // Use Respawn Event to call this
-    public void OnResetValuesOnRespawn()
-    {
-        ResetValuesOnGoal = new ResetableValuesOnRespawn();
-    }
-
-    void EnumCollision(Transform other)
+    void GoalScore(Transform other)
     {
         if (!other.gameObject.TryGetComponent<CollisionEnter>(out var collisionEnter)) return;
         var collisionEnterType = collisionEnter.collisionEnterType;
         // Goal
         var teamGoal = collisionEnterType == collisionEnterTypes.teamGoal;
         var playerGoal = collisionEnterType == collisionEnterTypes.playerGoal;
-        if ((teamGoal || playerGoal) && !ResetValuesOnGoal.HasScored)
+        if ((teamGoal || playerGoal) && !goalScoreDeviceGameManager.resetValuesOnGoal.HasScored)
         {
             GoalScored(playerGoal: playerGoal, teamGoal: teamGoal, collisionEnter: collisionEnter);
         }
@@ -305,66 +221,9 @@ public class GoalScoreDevice : MonoBehaviour
         // Blast players away from the explosion
         BlastPlayers(transform.position, rb.linearVelocity.magnitude);
 
-        if (!waitingForBallTouchGroundOrScoredToEndGame && !waitingForBallToScoreToEndGame)
-        {
-            // Raise goal event
-            goalEvent.Raise();
-        }
-
-        ResetValuesOnGoal.HasScored = true;
-        HandleGoalScorePoint(playerGoal: playerGoal, teamGoal: teamGoal, collisionEnter: collisionEnter);
-
         // Start respawn timer
         Freeze();
         SetVisibleAndCollidable(false, false);
-
-        // If the ball touched ground to end the game is active then need to check if the game has ended. And if it has not then need to start the overtime.
-        // This has to happen at the end because the score needs to be counted before you can check if the game has ended.
-        if (waitingForBallTouchGroundOrScoredToEndGame)
-        {
-            waitingForBallTouchGroundOrScoredToEndGame = false;
-            ballTouchedGroundOrScoredToEndGame.Raise();
-        }
-        if (waitingForBallToScoreToEndGame)
-        {
-            ballScoredInOvertimeToEndGame.Raise();
-        }
-    }
-
-    private void HandleGoalScorePoint(bool teamGoal, bool playerGoal, CollisionEnter collisionEnter)
-    {
-        // Add to score and count who last hit it
-        (var teamScoredOn, var playerScoredOn) = FuncUtil.Invoke<(int?, int?)>(() =>
-        {
-            if (teamGoal)
-                return (collisionEnter.intField, null);
-            if (playerGoal)
-                return (null, collisionEnter.intField);
-            throw new Exception("Should be either team or player goal");
-        });
-        // Send out event that team was scored on
-        var lastHitPlayerData = ResetValuesOnGoal.GetLastHitPlayerData(teamScoredOn, playerScoredOn);
-        Debug.Log($"Player {lastHitPlayerData?.Player.PlayerName} on {lastHitPlayerData?.PlayerSpar.Team} team scored on {teamScoredOn}");
-
-        // If someone scored then they/their team gets the point.
-        if (lastHitPlayerData != null)
-        {
-            playerScoreManager.AddScore(lastHitPlayerData.PlayerSpar.Team, lastHitPlayerData.Player.PlayerNumber);
-        }
-        else
-        {
-            // If no one scored then everyone but the team/player gets a point.
-            // Add to every other team
-            var allTeams = playerSparData.AllTeams();
-            if (allTeams.Count > 0)
-            {
-                var teams = allTeams.Where(t => t != teamScoredOn).ToList();
-                teams.ForEach(t => playerScoreManager.AddScore(t, 0 /* Set to 0 because it does not matter as long as t is not 0 */));
-            }
-
-            // Add to every other player
-            var singlePlayers = playerSparData.SinglePlayers().Where(p => p != playerScoredOn).ToList();
-            singlePlayers.ForEach(sp => playerScoreManager.AddScore(0, sp));
-        }
+        goalScoreDeviceGameManager.GoalScored(playerGoal, teamGoal, collisionEnter);
     }
 }
